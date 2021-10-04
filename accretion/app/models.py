@@ -13,3 +13,10 @@ class Profile(models.Model):
 
     def __str__ (self):
         return self.user.username
+
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    """ Create a new profile object when a Django User is created."""
+    if created:
+        Profile.objects.create(user=instance)
