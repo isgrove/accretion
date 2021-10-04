@@ -20,3 +20,27 @@ def create_user_profile(sender, instance, created, **kwargs):
     """ Create a new profile object when a Django User is created."""
     if created:
         Profile.objects.create(user=instance)
+
+
+class Portfolio(models.Model):
+    owner = models.ForeignKey(
+        Profile,
+        on_delete=models.CASCADE,
+    )
+
+
+class Trade(models.Model):
+    portfolio = models.ForeignKey(
+        Portfolio,
+        on_delete=models.CASCADE,
+    )
+    trade_date = models.DateField()
+    symbol = models.CharField(max_length=12)
+    units = models.FloatField()
+    effective_price = models.FloatField()
+    units = models.FloatField()
+    brokerage_fee = models.FloatField()
+    trade_type = models.CharField(max_length=1) # B or S
+
+    def get_trade_value(self):
+        return float((self.units * self.effective_price))
