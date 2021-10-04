@@ -4,12 +4,19 @@
     margin: 0;
 }
 
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  }
+
 .container {
     margin: 0 auto;
     width: 90%;
     max-width: 750px;
 }
 
-html {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+label, input {
+    display: block;
+}
+span.helptext {
+    display: none;
 }
