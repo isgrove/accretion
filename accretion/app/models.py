@@ -15,18 +15,19 @@ class Profile(models.Model):
         return self.user.username
 
 
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    """ Create a new profile object when a Django User is created."""
-    if created:
-        Profile.objects.create(user=instance)
-
-
 class Portfolio(models.Model):
     owner = models.ForeignKey(
         Profile,
         on_delete=models.CASCADE,
     )
+
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    """ Create a new profile object when a Django User is created."""
+    if created:
+        portfolio = Profile.objects.create(user=instance)
+        Portfolio.objects.create(owner=portfolio)
 
 
 class Trade(models.Model):
