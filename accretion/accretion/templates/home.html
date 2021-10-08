@@ -4,5 +4,10 @@
 
 {% block content %}
     <h1>Home</h1>
-    <p>Have an account? <a href="{% url 'app:login' %}">Login</a></p>
+    {% if user.is_authenticated %}
+        <p>Welcome {{ user.username }}</p>
+        <a href="{% url 'app:logout' %}">Logout</a>
+    {% else %}
+        <p>Have an account? <a href="{% url 'app:login' %}">Login</a></p>
+    {% endif %}
 {% endblock %}
