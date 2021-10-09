@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
+    'tailwind',
+    'theme',
 ]
 
 MIDDLEWARE = [
@@ -140,3 +142,13 @@ LOGOUT_REDIRECT_URL = '/'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+# Django Tailwind
+# https://django-tailwind.readthedocs.io/en/latest/installation.html
+TAILWIND_APP_NAME = 'theme'
+
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]

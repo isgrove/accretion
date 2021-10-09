@@ -3,11 +3,11 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-    <h1>Home</h1>
+    <h1 class="mb-2">Home</h1>
     {% if user.is_authenticated %}
-        <p>Welcome {{ user.username }}</p>
-        <a href="{% url 'app:logout' %}">Logout</a>
+        <p class="mb-2">Welcome {{ user.username }}</p>
+        <a class="text-blue-700 mb-2" href="{% url 'app:logout' %}">Logout</a>
     {% else %}
-        <p>Have an account? <a href="{% url 'app:login' %}">Login</a></p>
+        <p class="mb-2">Have an account? <a class="text-blue-700" href="{% url 'app:login' %}">Login</a></p>
     {% endif %}
 {% endblock %}
