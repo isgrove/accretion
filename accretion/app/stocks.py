@@ -21,7 +21,6 @@ def upload_portfolio(data_file, portfolio_id):
                         trade_type = row[4],
                         portfolio_id = portfolio_id
                     )
-                    print(f"Added {row[3].upper()} to the database")
                 except Exception as ex:
                     print(f"Error: {ex}")
 
@@ -35,7 +34,6 @@ def get_display_data(portfolio_id):
         if trade.trade_type == "S":
             trade.effective_price = -trade.effective_price 
             trade.units = -trade.units
-            print(f"price: {trade.effective_price} | units: {trade.units}")
 
         if trade.symbol in trade_data:
             trade_data[trade.symbol]["units"] += trade.units
@@ -46,6 +44,5 @@ def get_display_data(portfolio_id):
                 "value" :trade.units * trade.effective_price,
             }
             trade_data[trade.symbol] = data
-
-    print(trade_data["GOLD"]["value"])
+            
     return trade_data
