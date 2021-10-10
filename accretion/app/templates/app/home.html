@@ -3,9 +3,18 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-    {% if user.is_authenticated %}
-        {% include "includes/home_app.html" %}
-    {% else %}
-        {% include "includes/home_marketing.html" %}
-    {% endif %}
+<div class="bg-gray-100 p-6">
+    <div class="container text-center mx-auto">
+        <h1 class="mb-4">Get a Bird's Eye View of Your Stock Portfolio</h1>
+        <p class="text-grey-700 mb-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus porro, ducimus
+            neque illo dicta vero voluptatem reprehenderit ullam blanditiis, assumenda animi sint. Mollitia, cupiditate
+            repudiandae obcaecati beatae velit nulla molestiae.</p>
+        <a class="font-medium text-white px-4 py-2 no-underline bg-blue-800 rounded inline-block transition-all hover:bg-blue-700 mb-4"
+            href="{% url 'app:signup' %}">Get Started</a>
+        <p class="mb-4 text-xs">Already have an account? <a class="text-blue-800 hover:text-blue-700"
+                href="{% url 'app:login' %}">Login</a></p>
+    </div>
+</div>
+<div class="container">
+</div>
 {% endblock %}

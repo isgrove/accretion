@@ -3,12 +3,12 @@
         <div class="grid grid-cols-2">
             <div>
                 <a class="font-medium text-black mr-4 px-2 py-2 no-underline hover:text-blue-800 hover:bg-blue-100 transition-all
-            {% if request.path == '/dashboard' %}border-0 border-b-2 border-blue-800 border-solid text-blue-800 hover:rounded hover:border-b-0
+            {% if request.path == '/dashboard/' %}border-0 border-b-2 border-blue-800 border-solid text-blue-800 hover:rounded hover:border-b-0
             {% else %} rounded {% endif %}" href="{% url 'app:home' %}">Dashboard</a>
 
                 <a class="font-medium text-black mr-4 px-2 py-2 no-underline hover:text-blue-800 hover:bg-blue-100 transition-all
-            {% if request.path == '/' %}border-0 border-b-2 border-blue-800 border-solid text-blue-800 hover:rounded hover:border-b-0
-            {% else %} rounded {% endif %}" href="{% url 'app:home' %}">Portfolio</a>
+            {% if request.path == '/portfolio/' %}border-0 border-b-2 border-blue-800 border-solid text-blue-800 hover:rounded hover:border-b-0
+            {% else %} rounded {% endif %}" href="{% url 'app:portfolio' %}">Portfolio</a>
             </div>
             <div class="mr-0 ml-auto">
                 <a class="font-medium text-black mr-4 px-2 py-2 no-underline hover:text-blue-800 hover:bg-blue-100 transition-all

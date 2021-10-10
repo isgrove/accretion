@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
 from django.core.files.storage import default_storage
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -23,18 +24,31 @@ def signup(request):
 
 
 def home(request):
+    print("Home loaded")
     if request.user.is_authenticated:
-        portfolio_id = Portfolio.objects.get(owner_id=Profile.objects.get(user_id=request.user.id).id).id
-        return render(
-            request,
-            "app/home.html",
-            {"trade_data": get_display_data(portfolio_id)}
-        )
+        print("Redirecting from home to portfolio")
+        return redirect("app:dashboard") #TODO: change to dashboard
     else:
         return render(
             request,
             "app/home.html",
         )
+
+
+def dashboard(request):
+    return render(
+        request,
+        "app/dashboard.html",
+    )
+
+
+def portfolio(request):
+    portfolio_id = Portfolio.objects.get(owner_id=Profile.objects.get(user_id=request.user.id).id).id
+    return render(
+        request,
+        "app/portfolio.html",
+        {"trade_data": get_display_data(portfolio_id)}
+    )
 
 
 def upload_portfolio_data(request):

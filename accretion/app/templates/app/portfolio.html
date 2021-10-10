@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Portfolio{% endblock %}
+
+{% block navigation %}{% include "includes/navigation_app.html" %}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="text-2xl">Your portfolio</h1>
+        <div class="mb-6">
+            {% if trade_data.items|length > 0%}
+                {% for key, values in trade_data.items %}
+                {% if values.units > 0 %}
+                    {% include "includes/portfolio_item.html" %}
+                {% endif %}
+                {% endfor %}
+            {% else %}
+                {% include "includes/no_trade_data.html" %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
