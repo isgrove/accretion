@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% include "includes/navigation_app.html" %}
 <div class="container">
-    <h2>Register</h2>
+    <h2>Upload your portfolio data</h2>
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
