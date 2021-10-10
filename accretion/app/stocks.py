@@ -1,6 +1,13 @@
 import csv
 
 from .models import Trade, Profile, Portfolio
+from accretion.secrets import IEX_KEY
+import aiohttp
+import asyncio
+import time
+
+
+IEX_URL = "https://cloud.iexapis.com/stable/"
 
 
 # Takes user's trade data from csv file and adds it to the database
@@ -25,9 +32,19 @@ def upload_portfolio(data_file, portfolio_id):
                     print(f"Error: {ex}")
 
 
+async def get_price_only(symbol):
+    async with aiohttp.ClientSession() as session:
+        request_url = f"{IEX_URL}stock/{symbol}/price?token={IEX_KEY}"
+        async with session.get(request_url) as resp:
+            stock_price = await resp.json()
+    return stock_price
+
+
 # Returns the user's trade data for their dashboard
 # TODO: adjust for split and live stock price
 def get_display_data(portfolio_id):
+    print("Getting display data...")
+    start = time.time()
     raw_trade_data = Trade.objects.filter(portfolio_id = portfolio_id)
     trade_data = {}
     for trade in raw_trade_data:
@@ -37,12 +54,17 @@ def get_display_data(portfolio_id):
 
         if trade.symbol in trade_data:
             trade_data[trade.symbol]["units"] += trade.units
-            trade_data[trade.symbol]["value"] += trade.units * trade.effective_price
+            trade_data[trade.symbol]["value"] += trade.units * trade_data[trade.symbol]["current_price"]
         else:
+            current_stock_price = asyncio.run(get_price_only(trade.symbol))
             data = {
+                "current_price" : current_stock_price,
                 "units" : trade.units,
-                "value" :trade.units * trade.effective_price,
+                "value" : trade.units * current_stock_price,
             }
             trade_data[trade.symbol] = data
-            
+
+    end = time.time()
+    total_time = end - start
+    print(f"It took {total_time}s to get the data for {len(trade_data)} companies.")
     return trade_data

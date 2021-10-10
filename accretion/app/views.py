@@ -19,25 +19,22 @@ def signup(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect("/")
+            return redirect("app:home")
 
 
 def home(request):
     if request.user.is_authenticated:
         portfolio_id = Portfolio.objects.get(owner_id=Profile.objects.get(user_id=request.user.id).id).id
-        trade_data = get_display_data(portfolio_id)
-        print("User is logged in")
         return render(
             request,
             "app/home.html",
-            {"trade_data": trade_data}
+            {"trade_data": get_display_data(portfolio_id)}
         )
     else:
         return render(
             request,
             "app/home.html",
         )
-
 
 
 def upload_portfolio_data(request):
@@ -53,7 +50,7 @@ def upload_portfolio_data(request):
             upload_portfolio(file_name, portfolio_id)
 
             messages.add_message(request, messages.SUCCESS, "You have successfully uploaded your portfolio data.")
-            return redirect("/")
+            return redirect("app:home")
     else:
         form = PortfolioDataForm()
     return render(request, 'app/upload.html', {'form': form})
