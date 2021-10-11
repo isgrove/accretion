@@ -18,9 +18,7 @@
     <div class="container">
         {% if messages %}
             {% for message in messages%}
-                <div class="django-message">
-                    {{ message }}
-                </div>
+                {% include 'includes/message.html' with message=message %}
             {% endfor %}
         {% endif %}
     </div>

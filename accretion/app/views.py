@@ -36,6 +36,12 @@ def home(request):
 
 
 def dashboard(request):
+    # DEBUG messages
+    messages.add_message(request, messages.DEBUG, "Debug.")
+    messages.add_message(request, messages.INFO, "Info.")
+    messages.add_message(request, messages.SUCCESS, "Success.")
+    messages.add_message(request, messages.WARNING, "Warning.")
+    messages.add_message(request, messages.ERROR, "Error.")
     return render(
         request,
         "app/dashboard.html",
