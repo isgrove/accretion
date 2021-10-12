@@ -42,6 +42,7 @@ class Trade(models.Model):
     units = models.FloatField()
     brokerage_fee = models.FloatField()
     trade_type = models.CharField(max_length=1) # B or S
+    last_adjusted = models.DateField(auto_now=True)
 
     def get_trade_value(self):
         return float((self.units * self.effective_price))

@@ -12,19 +12,37 @@ IEX_URL = "https://cloud.iexapis.com/stable/"
 
 # Takes user's trade data from csv file and adds it to the database
 # TODO: Check for valid data before adding it to the database
-def upload_portfolio(data_file, portfolio_id):
+def upload_portfolio(data_file, portfolio_id, is_adjusted):
+    split_data = {}
     with open("media/" + data_file, newline='' ) as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='|')
         next(reader)
         for row in reader:
             if row[0] != "":
+                symbol = row[3].upper()
+                trade_date = row[1]
+                effective_price = float(row[6])
+                units = float(row[5])
+
+                if not is_adjusted:
+                    if symbol not in split_data:
+                        splits = asyncio.run(get_splits_basic(symbol))
+                        split_data[symbol] = splits
+                    for split in split_data[symbol]:
+                        ex_date = split["exDate"]
+                        to_factor = split["toFactor"]
+                        print(f"{ex_date} > {trade_date}")
+                        if ex_date > trade_date:
+                            print(f"Adjusting {symbol} for stock split...")
+                            units *= to_factor
+                            effective_price *= to_factor
                 try:
                     Trade.objects.create(
-                        trade_date = row[1],
-                        symbol = row[3].upper(),
-                        effective_price = float(row[6]),
-                        units = float(row[5]),
-                        brokerage_fee = float(row[7]),
+                        trade_date = trade_date,
+                        symbol = symbol,
+                        effective_price = effective_price,
+                        units = units,
+                        brokerage_fee = row[7],
                         trade_type = row[4],
                         portfolio_id = portfolio_id
                     )
@@ -40,12 +58,20 @@ async def get_price_only(symbol):
     return stock_price
 
 
+async def get_splits_basic(symbol):
+    async with aiohttp.ClientSession() as session:
+        request_url = f"{IEX_URL}stock/{symbol}/splits?token={IEX_KEY}"
+        async with session.get(request_url) as resp:
+            stock_splits = await resp.json()
+    return stock_splits
+
+
 # Returns the user's trade data for their dashboard
 # TODO: adjust for split and live stock price
 def get_display_data(portfolio_id):
     print("Getting display data...")
     start = time.time()
-    raw_trade_data = Trade.objects.filter(portfolio_id = portfolio_id)
+    raw_trade_data = Trade.objects.filter(portfolio_id = portfolio_id, symbol = "NVDA")
     trade_data = {}
     for trade in raw_trade_data:
         if trade.trade_type == "S":

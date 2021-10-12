@@ -54,14 +54,12 @@ def portfolio(request):
 def upload_portfolio_data(request):
     if request.method == 'POST':
         form = PortfolioDataForm(request.POST, request.FILES)
-        if form.is_valid():            
+        if form.is_valid():
             new_file = request.FILES['csv_file']
             file_name = default_storage.save(new_file.name, new_file)
-
-            print(file_name)
-
             portfolio_id = Portfolio.objects.get(owner_id=Profile.objects.get(user_id=request.user.id).id).id
-            upload_portfolio(file_name, portfolio_id)
+            is_adjusted = form.cleaned_data['is_adjusted']
+            upload_portfolio(file_name, portfolio_id, is_adjusted)
 
             messages.add_message(request, messages.SUCCESS, "You have successfully uploaded your portfolio data.")
             return redirect("app:home")

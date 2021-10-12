@@ -9,3 +9,4 @@ class CustomUserCreationForm(UserCreationForm):
 
 class PortfolioDataForm(forms.Form):
     csv_file = forms.FileField()
+    is_adjusted = forms.BooleanField(required=False)
