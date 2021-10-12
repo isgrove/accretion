@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings{% endblock %}
+
+{% block navigation %}{% include "includes/navigation_app.html" %}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto lg:max-w-screen-md">
+    <h1 class="text-2xl mb-6">Settings</h1>
+    <div class="my-6 border-solid border-0 border-b border-gray-300 pb-6">
+        <h2 class="text-xl mb-2">Account settings</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="my-4">
+                <p class="pb-2 font-bold">{{ form.first_name.label }}</p>
+                {{ form.first_name }}
+            </div>
+            <div class="my-4">
+                <p class="pb-2 font-bold">{{ form.last_name.label }}</p>
+                {{ form.last_name }}
+            </div>
+            <div class="my-4">
+                <p class="pb-2 font-bold">{{ form.email.label }}</p>
+                {{ form.email }}
+            </div>
+            <div class="my-4">
+                <input type="submit" value="Save" class="border-0 text-white px-6 py-2 no-underline bg-blue-800 rounded inline-block transition-all hover:bg-blue-700">
+            </div>
+        </form>
+    </div>
+    <div class="my-6 border-solid border-0 border-b border-gray-300 pb-6">
+        <h2 class="text-xl my-2">Subscription plan</h2>
+        <p>Coming soon...</p>
+    </div>
+    <div class="my-6 border-solid border-0 border-b border-gray-300 pb-6">
+        <h2 class="text-xl my-2">Change passsword</h2>
+        <p>Coming soon...</p>
+    </div>
+</div>
+{% endblock %}

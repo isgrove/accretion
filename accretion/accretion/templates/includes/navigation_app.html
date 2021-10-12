@@ -1,4 +1,4 @@
-<div class="shadow-md mb-6 p-6 ">
+<div class="shadow-md mb-4 p-6 ">
     <div class="container mx-auto">
         <div class="grid grid-cols-2">
             <div>
@@ -12,8 +12,8 @@
             </div>
             <div class="mr-0 ml-auto">
                 <a class="font-medium text-black mr-4 px-2 py-2 no-underline hover:text-blue-800 hover:bg-blue-100 transition-all
-                {% if request.path == '/settings/' %}border-0 border-b-2 border-blue-800 border-solid text-blue-800 hover:rounded hover:border-b-0
-                {% else %} rounded {% endif %}" href="{% url 'app:settings' %}">Settings</a>
+                {% if request.path == '/account/portfolio/' %}border-0 border-b-2 border-blue-800 border-solid text-blue-800 hover:rounded hover:border-b-0
+                {% else %} rounded {% endif %}" href="{% url 'app:upload' %}">Settings</a>
 
                 <a class="font-medium text-black mr-4 px-2 py-2 no-underline hover:text-blue-800 hover:bg-blue-100 transition-all
                 rounded" href="{% url 'app:logout' %}">Logout</a>
