@@ -71,7 +71,7 @@ async def get_splits_basic(symbol):
 def get_display_data(portfolio_id):
     print("Getting display data...")
     start = time.time()
-    raw_trade_data = Trade.objects.filter(portfolio_id = portfolio_id, symbol = "NVDA")
+    raw_trade_data = Trade.objects.filter(portfolio_id = portfolio_id)
     trade_data = {}
     for trade in raw_trade_data:
         if trade.trade_type == "S":
