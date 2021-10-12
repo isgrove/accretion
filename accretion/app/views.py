@@ -1,10 +1,11 @@
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from .forms import CustomUserCreationForm, PortfolioDataForm
+from .forms import CustomUserCreationForm, PortfolioDataForm, AccountSettingsForm
 from .stocks import upload_portfolio, get_display_data
 from .models import Profile, Portfolio
 
@@ -24,9 +25,7 @@ def signup(request):
 
 
 def home(request):
-    print("Home loaded")
     if request.user.is_authenticated:
-        print("Redirecting from home to portfolio")
         return redirect("app:dashboard") #TODO: change to dashboard
     else:
         return render(
@@ -49,6 +48,30 @@ def portfolio(request):
         "app/portfolio.html",
         {"trade_data": get_display_data(portfolio_id)}
     )
+
+
+def settings(request):
+    user = User.objects.get(id=request.user.id)
+    if request.method == 'POST':
+        form = AccountSettingsForm(request.POST)
+        if form.is_valid():
+            User.objects.filter(id=request.user.id).update(
+                first_name = form.cleaned_data['first_name'],
+                last_name = form.cleaned_data['last_name'],
+                email = form.cleaned_data['email'],
+            )
+    else:
+        form = AccountSettingsForm(initial={
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            })
+    return render(
+        request,
+        "app/settings.html",
+        {'form': form},
+    )
+
 
 
 def upload_portfolio_data(request):
