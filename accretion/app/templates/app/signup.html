@@ -1,15 +1,17 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2 class="mb-2">Register</h2>
+<div class="container mx-auto">
+    <h2 class="mb-2">Register</h2>
 
-<form method="post" class="mb-2">
-    {% csrf_token %}
-    {{form}}
-    <input type="submit" value="Register">
-</form>
-<p>
-    Have an account?
-    <a class="text-blue-700" href="{% url 'app:login' %}">Log in</a>
-</p>
+    <form method="post" class="mb-2">
+        {% csrf_token %}
+        {{form}}
+        <input type="submit" value="Register">
+    </form>
+    <p>
+        Have an account?
+        <a class="text-blue-700" href="{% url 'app:login' %}">Log in</a>
+    </p>
+</div>
 {% endblock %}
