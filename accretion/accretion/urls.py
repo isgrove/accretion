@@ -19,8 +19,10 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
 from app import urls as app_urls
+from api import urls as api_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/', include(api_urls, namespace="api")),
     path('', include(app_urls, namespace="app")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

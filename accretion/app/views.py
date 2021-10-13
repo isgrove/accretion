@@ -42,11 +42,11 @@ def dashboard(request):
 
 
 def portfolio(request):
-    portfolio_id = Portfolio.objects.get(owner_id=Profile.objects.get(user_id=request.user.id).id).id
+    # portfolio_id = Portfolio.objects.get(owner_id=Profile.objects.get(user_id=request.user.id).id).id
+    # get_display_data(portfolio_id)
     return render(
         request,
-        "app/portfolio.html",
-        {"trade_data": get_display_data(portfolio_id)}
+        "app/portfolio.html"
     )
 
 

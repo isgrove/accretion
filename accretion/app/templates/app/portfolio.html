@@ -7,16 +7,16 @@
 {% block content %}
     <div class="container mx-auto lg:max-w-screen-md">
         <h1 class="text-2xl">Your portfolio</h1>
-        <div class="mb-6">
-            {% if trade_data.items|length > 0%}
-                {% for key, values in trade_data.items %}
-                {% if values.units > 0 %}
-                    {% include "includes/portfolio_item.html" %}
-                {% endif %}
-                {% endfor %}
-            {% else %}
-                {% include "includes/no_trade_data.html" %}
-            {% endif %}
+        <div id="spinner-box">
+            Loading...
+        </div>
+        <div id="data-box" class="hidden">
         </div>
     </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    loadPortfolioPage();
+</script>
 {% endblock %}
