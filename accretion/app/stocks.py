@@ -67,7 +67,6 @@ async def get_splits_basic(symbol):
 
 
 # Returns the user's trade data for their dashboard
-# TODO: adjust for split and live stock price
 def get_display_data(portfolio_id):
     print("Getting display data...")
     start = time.time()
