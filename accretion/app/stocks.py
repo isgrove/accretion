@@ -66,11 +66,31 @@ async def get_splits_basic(symbol):
     return stock_splits
 
 
-# Returns the user's trade data for their dashboard
-def get_display_data(portfolio_id):
-    print("Getting display data...")
+# Method for getting stock prices for get_portfolio_data()
+def get_price_tasks(session, symbols):
+    tasks = []
+    for symbol in symbols:
+        request_url = f"{IEX_URL}stock/{symbol['symbol']}/previous?token={IEX_KEY}"
+        tasks.append(session.get(request_url, ssl=False))
+    return tasks
+
+
+# Gets all of the data for the portfolio page
+async def get_portfolio_data(symbols, raw_trade_data):
     start = time.time()
-    raw_trade_data = Trade.objects.filter(portfolio_id = portfolio_id)
+    results = []
+    prices = {}
+
+    session = aiohttp.ClientSession()
+    tasks = get_price_tasks(session, symbols)
+    responses = await asyncio.gather(*tasks)
+
+    for response in responses:
+        results.append(await response.json())
+    await session.close()
+
+    for x in results:
+        prices[x["symbol"]] = x["close"]
     trade_data = {}
     for trade in raw_trade_data:
         if trade.trade_type == "S":
@@ -81,7 +101,7 @@ def get_display_data(portfolio_id):
             trade_data[trade.symbol]["units"] += trade.units
             trade_data[trade.symbol]["value"] += trade.units * trade_data[trade.symbol]["current_price"]
         else:
-            current_stock_price = asyncio.run(get_price_only(trade.symbol))
+            current_stock_price = prices[trade.symbol]
             data = {
                 "current_price" : current_stock_price,
                 "units" : trade.units,
