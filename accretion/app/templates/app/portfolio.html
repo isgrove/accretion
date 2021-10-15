@@ -7,10 +7,12 @@
 {% block content %}
     <div class="container mx-auto lg:max-w-screen-md">
         <h1 class="text-2xl">Your portfolio</h1>
-        <div id="spinner-box">
+        <div id="loading">
             Loading...
         </div>
-        <div id="data-box" class="hidden">
+        <div id="content" class="hidden">
+            <div id="total">
+            </div>
         </div>
     </div>
 {% endblock %}

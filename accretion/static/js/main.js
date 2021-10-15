@@ -1,15 +1,14 @@
-
 function loadPortfolioPage() {
-    const spinnerBox = document.getElementById("spinner-box");
-    const dataBox = document.getElementById("data-box");
+    const loadingElement = document.getElementById("loading");
+    const contentElement = document.getElementById("content");
 
     $.ajax({
         dataType: "json",
         type: 'GET',
         url: '/api/portfolio/',
         success: response => {
-            spinnerBox.classList.add("hidden");
-            dataBox.classList.remove("hidden");
+            loadingElement.classList.add("hidden");
+            contentElement.classList.remove("hidden");
             if (jQuery.isEmptyObject(response)) {
                 createNoTradeDataElement();
             }
@@ -18,17 +17,20 @@ function loadPortfolioPage() {
                     style: 'currency',
                     currency: 'USD',
                 });
+                let totalValue = 0;
+
                 for (const [symbol, data] of Object.entries(response)) {
-                    const value = formatter.format(data["value"]);
+                    totalValue += data["value"];
                     const units = Number((data["units"]).toFixed(4));
                     if (units > 0) {
-                        createPortfolioElement(symbol, value, units);
+                        createPortfolioElement(symbol, data);
                     }
                 }
+                $("#total").append(`<h3>Total value: ${formatter.format(totalValue)}</h3>`);
             }
         },
         error: error => {
-            $("#data-box").append(createErrorElement());
+            $("#content").append(createErrorElement());
         }
     });
 }
@@ -41,16 +43,27 @@ function createNoTradeDataElement() {
         <a class="font-medium text-white px-4 py-2 no-underline bg-blue-800 rounded inline-block transition-all hover:bg-blue-700" href="/account/portfolio/">Add trade data</a>
     </div>
     `);
-    $("#data-box").append(newElement);
+    $("content").append(newElement);
 }
 
-function createPortfolioElement(ticker, value, units) {
+function createPortfolioElement(symbol, data) {
+    var formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+    });
+
+    const totalGains = formatter.format(data["value"] - data["purchase_price"]);
+    const totalGainsPercentage = Number((data["value"] - data["purchase_price"]) / data["purchase_price"] * 100).toFixed(2);
+    const value = formatter.format(data["value"]);
+    const units = Number((data["units"]).toFixed(4));
+    
     var newElement = $(`
     <div class="py-4 border-0 border-b-2 border-gray-300 border-solid transition-all group grid grid-cols-2">
         <div>
-            <p class="mr-2 mb-1 font-bold text-lg">${ticker}</p>
+            <p class="mr-2 mb-1 font-bold text-lg">${symbol}</p>
             <p class="mr-2">Holding value: ${value}</p>
             <p class="mr-2">Shares: ${units}</p>
+            <p class="mr-2">Total gains: ${totalGains} (${totalGainsPercentage}%)</p>
         </div>
         <div class="text-right hidden group-hover:inline-block">
             <p>
@@ -72,7 +85,7 @@ function createPortfolioElement(ticker, value, units) {
             </p>
         </div>
     </div>`);
-    $("#data-box").append(newElement);
+    $("#content").append(newElement);
 }
 
 function createErrorElement() {

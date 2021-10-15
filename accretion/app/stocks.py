@@ -100,10 +100,12 @@ async def get_portfolio_data(symbols, raw_trade_data):
         if trade.symbol in trade_data:
             trade_data[trade.symbol]["units"] += trade.units
             trade_data[trade.symbol]["value"] += trade.units * trade_data[trade.symbol]["current_price"]
+            trade_data[trade.symbol]["purchase_price"] += trade.units * trade.effective_price
         else:
             current_stock_price = prices[trade.symbol]
             data = {
                 "current_price" : current_stock_price,
+                "purchase_price" : trade.units * trade.effective_price,
                 "units" : trade.units,
                 "value" : trade.units * current_stock_price,
             }
