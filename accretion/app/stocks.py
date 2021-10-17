@@ -33,7 +33,7 @@ def upload_portfolio(data_file, portfolio_id, is_adjusted):
                         to_factor = split["toFactor"]
                         if ex_date > trade_date:
                             units *= to_factor
-                            effective_price *= to_factor
+                            effective_price /= to_factor
                 try:
                     Trade.objects.create(
                         trade_date = trade_date,
