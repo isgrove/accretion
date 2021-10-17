@@ -31,9 +31,7 @@ def upload_portfolio(data_file, portfolio_id, is_adjusted):
                     for split in split_data[symbol]:
                         ex_date = split["exDate"]
                         to_factor = split["toFactor"]
-                        print(f"{ex_date} > {trade_date}")
                         if ex_date > trade_date:
-                            print(f"Adjusting {symbol} for stock split...")
                             units *= to_factor
                             effective_price *= to_factor
                 try:
