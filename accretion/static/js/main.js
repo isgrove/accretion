@@ -25,9 +25,6 @@ function loadPortfolioPage() {
                     if (units > 0) {
                         createPortfolioElement(symbol, data);
                     }
-                    else {
-                        createNoTradeDataElement();
-                    }
                 }
                 $("#total").append(`<h3>Total value: ${formatter.format(totalValue)}</h3>`);
             }
