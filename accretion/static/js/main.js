@@ -25,6 +25,9 @@ function loadPortfolioPage() {
                     if (units > 0) {
                         createPortfolioElement(symbol, data);
                     }
+                    else {
+                        createNoTradeDataElement();
+                    }
                 }
                 $("#total").append(`<h3>Total value: ${formatter.format(totalValue)}</h3>`);
             }
@@ -43,7 +46,7 @@ function createNoTradeDataElement() {
         <a class="font-medium text-white px-4 py-2 no-underline bg-blue-800 rounded inline-block transition-all hover:bg-blue-700" href="/account/portfolio/">Add trade data</a>
     </div>
     `);
-    $("content").append(newElement);
+    $("#content").append(newElement);
 }
 
 function createPortfolioElement(symbol, data) {
