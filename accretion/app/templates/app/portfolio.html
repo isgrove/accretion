@@ -6,13 +6,46 @@
 
 {% block content %}
     <div class="container mx-auto lg:max-w-screen-md">
-        <h1 class="text-2xl">Your portfolio</h1>
         <div id="loading">
             Loading...
         </div>
         <div id="content" class="hidden">
-            <div id="total">
+            <div class="">
+                <div id="total">
+                </div>
+                <div class="mt-4 border-0 border-b border-t border-gray-300 border-solid py-2">
+                    <div class="px-4 flex justify-between ">
+                        <a class="font-medium text-black px-2 py-2 no-underline rounded inline-block transition-all hover:bg-gray-100"
+                    href="#">1D</a>
+                    <a class="font-medium text-black px-2 py-2 no-underline rounded inline-block transition-all hover:bg-gray-100"
+                    href="#">1W</a>
+                    <a class="font-medium text-black px-2 py-2 no-underline rounded inline-block transition-all hover:bg-gray-100"
+                    href="#">1M</a>
+                    <a class="font-medium text-black px-2 py-2 no-underline rounded inline-block transition-all hover:bg-gray-100"
+                    href="#">3M</a>
+                    <a class="font-medium text-black px-2 py-2 no-underline rounded inline-block transition-all hover:bg-gray-100"
+                    href="#">6M</a>
+                    <a class="font-medium text-black px-2 py-2 no-underline rounded inline-block transition-all hover:bg-gray-100"
+                    href="#">1Y</a>
+                    <a class="font-medium text-black px-2 py-2 no-underline rounded inline-block transition-all hover:bg-gray-100"
+                    href="#">YTD</a>
+                        <a class="font-medium text-white px-2 py-2 no-underline bg-blue-800 rounded inline-block transition-all hover:bg-blue-700"
+                    href="#">All</a>
+                    </div>
+                </div>
             </div>
+            <table class="my-4 table-auto w-full" id="portfolio-table">
+                <thead>
+                <tr class="text-left uppercase border-0 border-b border-solid border-gray-300">
+                  <th class="py-3">Symbol</th>
+                  <th>Shares</th>
+                  <th>Value</th>
+                  <th>Total Change</th>
+                </tr>
+                </thead>
+                <tbody id="portfolio-table-body">
+                </tbody>
+            </table>
         </div>
     </div>
 {% endblock %}

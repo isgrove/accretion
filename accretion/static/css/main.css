@@ -22,3 +22,16 @@ span.helptext {
     margin: 16px 0;
     border-radius: 8px;
 }
+
+/*
+    testing purposes, delete later
+*/
+table, th, td{
+    border-bottom: 1px solid rgb(209, 213, 219);
+    border-collapse: collapse;
+    font-weight: normal;
+}
+
+th, td {
+    margin: 6px 0;
+}
