@@ -1,3 +1,5 @@
+//TODO: Fix failed to load bug
+
 let totalValue = 0;
 let startingValue = 0;
 
@@ -17,6 +19,14 @@ var dollarFormatterZero = new Intl.NumberFormat('en-US', {
     signDisplay: "exceptZero",
 });
 
+const changeRowTitleElement = document.getElementById("change-row-heading");
+
+let currentView = "all";
+
+let tradeData = {};
+let dataOneYear = {};
+
+//TODO: Update so only 1 api request is being made
 function loadPortfolioPage() {
     const loadingElement = document.getElementById("loading");
     const contentElement = document.getElementById("content");
@@ -33,6 +43,7 @@ function loadPortfolioPage() {
                 createNoTradeDataElement();
             }
             else {
+                tradeData = response;
                 for (const [symbol, data] of Object.entries(response)) {
                     totalValue += data["value"];
                     const units = Number((data["units"]).toFixed(4));
@@ -42,7 +53,7 @@ function loadPortfolioPage() {
                 }
                 $("#total").append(`<h1 class="text-2xl font-normal">Portfolio</h2>`);
                 $("#total").append(`<h3 class="my-2 text-2xl font-normal">${dollarFormatter.format(totalValue)}</h3>`);
-                $("#total").append(`<p><span class="${getColour(totalValue - startingValue)}">${dollarFormatterZero.format(totalValue - startingValue)} (${dollarFormatterZero.format((totalValue - startingValue) / startingValue * 100)}%)</span> Total</p>`);
+                $("#total").append(`<p id="change-amount"><span class="${getColour(totalValue - startingValue)}">${dollarFormatterZero.format(totalValue - startingValue)} (${dollarFormatterZero.format((totalValue - startingValue) / startingValue * 100)}%)</span> Total</p>`);
             }
         },
         error: error => {
@@ -51,6 +62,14 @@ function loadPortfolioPage() {
             contentElement.classList.remove("hidden");
             tableElement.classList.add("hidden");
             $("#content").append(createErrorElement());
+        }
+    });
+    $.ajax({
+        dataType: "json",
+        type: 'GET',
+        url: '/api/portfolio-1y/',
+        success: response => {
+            dataOneYear = response
         }
     });
 }
@@ -80,38 +99,9 @@ function createPortfolioElement(symbol, data) {
         <td class="py-3">${symbol}</td>
         <td>${units}</td>
         <td>${value}</td>
-        <td class="${getColour(totalGains)}">${dollarFormatterZero.format(totalGains)} (${dollarFormatterZero.format(totalGainsPercentage)}%)</td>
+        <td class="${getColour(totalGains)}" id="${symbol.toLowerCase()}-change">${dollarFormatterZero.format(totalGains)} (${dollarFormatterZero.format(totalGainsPercentage)}%)</td>
     </tr>
     `)
-
-    // var newElement = $(`
-    // <div class="py-4 border-0 border-b-2 border-gray-300 border-solid transition-all group grid grid-cols-2">
-    //     <div>
-    //         <p class="mr-2 mb-1 font-bold text-lg">${symbol}</p>
-    //         <p class="mr-2">Holding value: ${value}</p>
-    //         <p class="mr-2">Shares: ${units}</p>
-    //         <p class="mr-2">Total gains: ${totalGains} (${totalGainsPercentage}%)</p>
-    //     </div>
-    //     <div class="text-right hidden group-hover:inline-block">
-    //         <p>
-    //             <span
-    //                 class="text-gray-500 w-auto pt-3 pb-1 px-2 ml-2 rounded hover:bg-gray-100 w-auto transition-all">
-    //                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-    //                     stroke="currentColor">
-    //                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-    //                 </svg>
-    //             </span>
-    //             <span
-    //                 class="text-gray-500 w-auto pt-3 pb-1 px-2 ml-2 rounded hover:bg-gray-100 w-auto transition-all">
-    //                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-    //                     stroke="currentColor">
-    //                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-    //                         d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-    //                 </svg>
-    //             </span>
-    //         </p>
-    //     </div>
-    // </div>`);
     $("#portfolio-table-body").append(newElement);
 }
 
@@ -134,4 +124,109 @@ function getColour(num) {
         return "text-red-700"
     }
     
+}
+
+//TODO: Add 6M, 1Y and YTD view
+function portfolioView(peroid) {
+    let peroidLong = "";
+    let total = 0;
+    let starting = 0;
+
+    const changeAmountElement = document.getElementById("change-amount");
+    if (peroid == currentView) {
+        return;
+    }
+    else if (peroid == "1d") {
+        peroidLong = "Day"
+        changeRowTitleElement.innerHTML = "DAY CHANGE";
+
+        for (trade in tradeData) {
+            if (tradeData[trade]["units"] > 0) {
+            const tradeElement = document.getElementById(trade.toLowerCase() + "-change");
+            const totalGainsPercentage = ((tradeData[trade]["close"] - dataOneYear[trade][1]["close"]) / 
+            dataOneYear[trade][1]["close"] * 100).toFixed(2)
+
+            total += tradeData[trade]["close"] * tradeData[trade]["units"];
+            starting += dataOneYear[trade][1]["close"] * tradeData[trade]["units"];
+
+            tradeElement.innerHTML = `<td class="${getColour(total-starting)}" id="${trade}-change">${dollarFormatterZero.format(total-starting)} (${dollarFormatterZero.format(totalGainsPercentage)}%)</td>`;
+            }
+        }
+    }
+    else if (peroid == "1w") {
+        peroidLong = "Week"
+        changeRowTitleElement.innerHTML = "WEEK CHANGE";
+
+        for (trade in tradeData) {
+            if (tradeData[trade]["units"] > 0) {
+            const tradeElement = document.getElementById(trade.toLowerCase() + "-change");
+            const totalGainsPercentage = ((tradeData[trade]["close"] - dataOneYear[trade][4]["close"]) / 
+            dataOneYear[trade][4]["close"] * 100).toFixed(2)
+
+            total += tradeData[trade]["close"] * tradeData[trade]["units"];
+            starting += dataOneYear[trade][4]["close"] * tradeData[trade]["units"];
+
+            tradeElement.innerHTML = `<td class="${getColour(total-starting)}" id="${trade}-change">${dollarFormatterZero.format(total-starting)} (${dollarFormatterZero.format(totalGainsPercentage)}%)</td>`;
+            }
+        }
+    }
+    else if (peroid == "1m") {
+        peroidLong = "Month"
+        changeRowTitleElement.innerHTML = "MONTH CHANGE";
+
+        for (trade in tradeData) {
+            if (tradeData[trade]["units"] > 0) {
+            const tradeElement = document.getElementById(trade.toLowerCase() + "-change");
+            const totalGainsPercentage = ((tradeData[trade]["close"] - dataOneYear[trade][29]["close"]) / 
+            dataOneYear[trade][29]["close"] * 100).toFixed(2)
+
+            total += tradeData[trade]["close"] * tradeData[trade]["units"];
+            starting += dataOneYear[trade][29]["close"] * tradeData[trade]["units"];
+
+            tradeElement.innerHTML = `<td class="${getColour(total-starting)}" id="${trade}-change">${dollarFormatterZero.format(total-starting)} (${dollarFormatterZero.format(totalGainsPercentage)}%)</td>`;
+            }
+        }
+    }
+    else if (peroid == "all") {
+        changeRowTitleElement.innerHTML = "TOTAL CHANGE";
+        peroidLong = "Total";
+        total = totalValue;
+        starting = startingValue;
+
+        for (trade in tradeData) {
+            if (tradeData[trade]["units"] > 0) {
+            const totalGains = tradeData[trade]["value"] - tradeData[trade]["purchase_price"];
+            const tradeElement = document.getElementById(trade.toLowerCase() + "-change");
+            const totalGainsPercentage = (tradeData[trade]["value"] - tradeData[trade]["purchase_price"]) / tradeData[trade]["purchase_price"] * 100
+
+            tradeElement.innerHTML = `<td class="${getColour(totalGains)}" id="${trade}-change">${dollarFormatterZero.format(totalGains)} (${dollarFormatterZero.format(totalGainsPercentage)}%)</td>`;
+            }
+        }
+    }
+    currentView = peroid;
+    setActiveButton(currentView);
+
+    // console.log("starting:" + starting);
+    // console.log("ending: " + total);
+    // console.log("diff: " + (starting - total));
+    // console.log(tradeData);
+    // console.log(peroid);
+
+    changeAmountElement.innerHTML = `<span class="${getColour(total - starting)}">${dollarFormatterZero.format(total - starting)} (${dollarFormatterZero.format((total - starting) / starting * 100)}%)</span> ${peroidLong}</p>`
+}
+
+function setActiveButton(activeButton) {
+    const buttons = ["1d", "1w", "1m", "3m", "6m", "1y", "ytd", "all"];
+    const activeButtonElement = document.getElementById(activeButton + "-button");
+
+    activeButtonElement.classList = "";
+    activeButtonElement.classList.add("font-medium", "text-white", "px-2", "py-2", "no-underline", "bg-blue-800", "rounded", "inline-block", "transition-all", "hover:bg-blue-700");
+
+    for (button in buttons) {
+        if (buttons[button] != activeButton) {
+            const buttonElement = document.getElementById(buttons[button] + "-button");
+            buttonElement.classList = "";
+            buttonElement.classList.add("font-medium", "text-black", "px-2", "py-2", "no-underline", "rounded", "inline-block", "transition-all", "hover:bg-gray-100");
+        }
+    }
 }

@@ -1,6 +1,6 @@
 import csv
 
-from .models import Trade, Profile, Portfolio
+from app.models import Trade, Profile, Portfolio
 from accretion.secrets import IEX_KEY
 import aiohttp
 import asyncio
@@ -64,7 +64,7 @@ async def get_splits_basic(symbol):
     return stock_splits
 
 
-# Method for getting stock prices for get_portfolio_data()
+# Method for getting stock close_data for get_portfolio_data()
 def get_price_tasks(session, symbols):
     tasks = []
     for symbol in symbols:
@@ -77,7 +77,8 @@ def get_price_tasks(session, symbols):
 async def get_portfolio_data(symbols, raw_trade_data):
     start = time.time()
     results = []
-    prices = {}
+    close_data = {}
+    open_data = {}
 
     session = aiohttp.ClientSession()
     tasks = get_price_tasks(session, symbols)
@@ -88,7 +89,8 @@ async def get_portfolio_data(symbols, raw_trade_data):
     await session.close()
 
     for x in results:
-        prices[x["symbol"]] = x["close"]
+        close_data[x["symbol"]] = x["close"]
+        open_data[x["symbol"]] = x["open"]
     trade_data = {}
     for trade in raw_trade_data:
         if trade.trade_type == "S":
@@ -97,19 +99,57 @@ async def get_portfolio_data(symbols, raw_trade_data):
 
         if trade.symbol in trade_data:
             trade_data[trade.symbol]["units"] += trade.units
-            trade_data[trade.symbol]["value"] += trade.units * trade_data[trade.symbol]["current_price"]
+            trade_data[trade.symbol]["value"] += trade.units * trade_data[trade.symbol]["close"]
             trade_data[trade.symbol]["purchase_price"] += trade.units * trade.effective_price
         else:
-            current_stock_price = prices[trade.symbol]
+            close_price = close_data[trade.symbol]
+            open_price = open_data[trade.symbol]
             data = {
-                "current_price" : current_stock_price,
+                "close" : close_price,
+                "open" : open_price,
                 "purchase_price" : trade.units * trade.effective_price,
                 "units" : trade.units,
-                "value" : trade.units * current_stock_price,
+                "value" : trade.units * close_price,
             }
             trade_data[trade.symbol] = data
 
     end = time.time()
     total_time = end - start
-    print(f"It took {total_time}s to get the data for {len(trade_data)} companies.")
+    #TODO: Send alert (via Telegram?) api call takes >10s
+    print("pls stop")
+    return trade_data
+
+
+#https://cloud.iexapis.com/stable/stock/twtr/chart/1y?token=pk_0d4b88face5f434b9f2e25c8d3b65f9e
+
+def get_chart_tasks(session, symbols, range):
+    tasks = []
+    for symbol in symbols:
+        request_url = f"{IEX_URL}stock/{symbol['symbol']}/chart/{range}?token={IEX_KEY}"
+        tasks.append(session.get(request_url, ssl=False))
+    return tasks
+
+
+# Gets all of the data for the portfolio page
+async def get_portfolio_data_1y(symbols, raw_trade_data):
+    print("Making request...")
+    start = time.time()
+    results = []
+
+    session = aiohttp.ClientSession()
+    tasks = get_chart_tasks(session, symbols, "1y")
+    responses = await asyncio.gather(*tasks)
+
+    for response in responses:
+        results.append(await response.json())
+    await session.close()
+
+    trade_data = {}
+    for result in results:
+        trade_data[result[0]["key"]] = [ele for ele in reversed(result)]
+        # print(result[0]["key"] + ": " + str(len(result)))
+
+    end = time.time()
+    total_time = end - start
+    print("Request took " + str(total_time) + " seconds.")
     return trade_data

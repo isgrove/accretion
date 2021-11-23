@@ -16,21 +16,21 @@
                 <div class="mt-4 border-0 border-b border-t border-gray-300 border-solid py-2">
                     <div class="px-4 flex justify-between ">
                         <a class="font-medium text-black px-2 py-2 no-underline rounded inline-block transition-all hover:bg-gray-100"
-                    href="#">1D</a>
+                    href="#" onclick="portfolioView('1d')" id="1d-button">1D</a>
                     <a class="font-medium text-black px-2 py-2 no-underline rounded inline-block transition-all hover:bg-gray-100"
-                    href="#">1W</a>
+                    href="#" onclick="portfolioView('1w')" id="1w-button">1W</a>
                     <a class="font-medium text-black px-2 py-2 no-underline rounded inline-block transition-all hover:bg-gray-100"
-                    href="#">1M</a>
+                    href="#" onclick="portfolioView('1m')" id="1m-button">1M</a>
                     <a class="font-medium text-black px-2 py-2 no-underline rounded inline-block transition-all hover:bg-gray-100"
-                    href="#">3M</a>
+                    href="#" onclick="portfolioView('3m')" id="3m-button">3M</a>
                     <a class="font-medium text-black px-2 py-2 no-underline rounded inline-block transition-all hover:bg-gray-100"
-                    href="#">6M</a>
+                    href="#" onclick="portfolioView('6m')" id="6m-button">6M</a>
                     <a class="font-medium text-black px-2 py-2 no-underline rounded inline-block transition-all hover:bg-gray-100"
-                    href="#">1Y</a>
+                    href="#" onclick="portfolioView('ytd')" id="ytd-button">YTD</a>
                     <a class="font-medium text-black px-2 py-2 no-underline rounded inline-block transition-all hover:bg-gray-100"
-                    href="#">YTD</a>
+                    href="#" onclick="portfolioView('1y')" id="1y-button">1Y</a>
                         <a class="font-medium text-white px-2 py-2 no-underline bg-blue-800 rounded inline-block transition-all hover:bg-blue-700"
-                    href="#">All</a>
+                    href="#" onclick="portfolioView('all')" id="all-button">All</a>
                     </div>
                 </div>
             </div>
@@ -40,7 +40,7 @@
                   <th class="py-3">Symbol</th>
                   <th>Shares</th>
                   <th>Value</th>
-                  <th>Total Change</th>
+                  <th id="change-row-heading">Total Change</th>
                 </tr>
                 </thead>
                 <tbody id="portfolio-table-body">

@@ -6,7 +6,7 @@ from django.core.files.storage import default_storage
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from .forms import CustomUserCreationForm, PortfolioDataForm, AccountSettingsForm
-from .stocks import upload_portfolio
+from api.stocks import upload_portfolio
 from .models import Profile, Portfolio
 
 
