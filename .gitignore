@@ -128,9 +128,11 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Accretion files
+accretion/media
 accretion/accretion/secrets.py
 
 *.sql
 .vscode
 
-accretion/media
+sendgrid.env
