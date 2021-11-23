@@ -116,7 +116,6 @@ async def get_portfolio_data(symbols, raw_trade_data):
     end = time.time()
     total_time = end - start
     #TODO: Send alert (via Telegram?) api call takes >10s
-    print("pls stop")
     return trade_data
 
 
@@ -132,7 +131,6 @@ def get_chart_tasks(session, symbols, range):
 
 # Gets all of the data for the portfolio page
 async def get_portfolio_data_1y(symbols, raw_trade_data):
-    print("Making request...")
     start = time.time()
     results = []
 
@@ -147,7 +145,6 @@ async def get_portfolio_data_1y(symbols, raw_trade_data):
     trade_data = {}
     for result in results:
         trade_data[result[0]["key"]] = [ele for ele in reversed(result)]
-        # print(result[0]["key"] + ": " + str(len(result)))
 
     end = time.time()
     total_time = end - start
