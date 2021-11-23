@@ -11,22 +11,26 @@ from .models import Profile, Portfolio
 
 
 def signup(request):
-    if request.method == "GET":
-        return render(
-            request, "app/signup.html",
-            {"form": CustomUserCreationForm}
-        )
-    elif request.method == "POST":
+    if request.method == "POST":
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
             return redirect("app:home")
+        else: 
+            return render(
+            request, "app/signup.html",
+            {"form": CustomUserCreationForm}
+        )
+    return render(
+        request, "app/signup.html",
+        {"form": CustomUserCreationForm}
+    )
 
 
 def home(request):
     if request.user.is_authenticated:
-        return redirect("app:dashboard") #TODO: change to dashboard
+        return redirect("app:dashboard")
     else:
         return render(
             request,
@@ -42,8 +46,6 @@ def dashboard(request):
 
 
 def portfolio(request):
-    # portfolio_id = Portfolio.objects.get(owner_id=Profile.objects.get(user_id=request.user.id).id).id
-    # get_display_data(portfolio_id)
     return render(
         request,
         "app/portfolio.html"
