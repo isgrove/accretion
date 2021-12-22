@@ -1,3 +1,5 @@
+#TODO: Sepeate these methods into different files
+
 import csv
 
 from app.models import Trade, Profile, Portfolio
@@ -5,6 +7,8 @@ from accretion.secrets import IEX_KEY
 import aiohttp
 import asyncio
 import time
+from datetime import datetime
+from pytz import timezone
 
 
 IEX_URL = "https://cloud.iexapis.com/stable/"
@@ -48,6 +52,29 @@ def upload_portfolio(data_file, portfolio_id, is_adjusted):
                     print(f"Error: {ex}")
 
 
+# Check if it is between 4:15pm (Mon - Fri) and 4am (Tue - Sat) ET time.  
+# Returns true if it is between that time
+# Returns false if its not between that time
+def check_time():
+    time_valid = False
+
+    tz = timezone('EST')
+    time = datetime.now(tz)
+
+    start_time = datetime.strptime("15:15:00", "%H:%M:%S").time()
+    end_time = datetime.strptime("03:00:00", "%H:%M:%S").time()
+    day = time.today().weekday()
+
+    if (day >= 0 and day <=5):
+        if (day == 0 and time.time() <= end_time):
+            print("invalid time")
+        elif (day == 5 and time.time() >= start_time):
+            print("invalid time")
+        elif (time.time() >= start_time or time.time() <= end_time):
+            time_valid = True
+    return day, time.time(), time_valid
+
+
 async def get_price_only(symbol):
     async with aiohttp.ClientSession() as session:
         request_url = f"{IEX_URL}stock/{symbol}/price?token={IEX_KEY}"
@@ -85,7 +112,7 @@ async def get_portfolio_data(symbols, raw_trade_data):
     responses = await asyncio.gather(*tasks)
 
     for response in responses:
-        results.append(await response.json())
+        results.append(await response.json(content_type=None))
     await session.close()
 
     for x in results:
@@ -129,24 +156,74 @@ def get_chart_tasks(session, symbols, range):
     return tasks
 
 
+def get_ohlc_tasks(session, symbols):
+    tasks = []
+    for symbol in symbols:
+        request_url = f"{IEX_URL}stock/{symbol['symbol']}/ohlc?token={IEX_KEY}"
+        tasks.append(session.get(request_url, ssl=False))
+    return tasks
+
 # Gets all of the data for the portfolio page
+# TODO: Check if chart data contains todays data, if not check OHLC for data. If neither have today's data, ignore.
 async def get_portfolio_data_1y(symbols, raw_trade_data):
     start = time.time()
     results = []
+    ohlc_results = []
 
     session = aiohttp.ClientSession()
     tasks = get_chart_tasks(session, symbols, "1y")
     responses = await asyncio.gather(*tasks)
 
     for response in responses:
-        results.append(await response.json())
+        results.append(await response.json(content_type=None))
     await session.close()
 
+    # ohlc_data = {}
+    # if time_valid:
+    #      for result in ohlc_results:
+    #         ohlc_data[result["symbol"]] = result
+
+    # TODO: Get OHLC data if chart data does not contain today's data.
+    # tz = timezone('EST')
+    # ny_time = datetime.now(tz)
+    # data_date = results[0][len(results[0])-1]["date"]
+    # if ny_time.time() >= datetime.strptime("15:15:00", "%H:%M:%S").time():
+    #     if data_date != ny_time:
+    #             print("no data")
+    #             session = aiohttp.ClientSession()
+    #             tasks = get_ohlc_tasks(session, symbols)
+    #             responses = await asyncio.gather(*tasks)
+
+    #             for response in responses:
+    #                 ohlc_results.append(await response.json(content_type=None))
+    #             await session.close()
+
     trade_data = {}
+
+    counter = 0
     for result in results:
         trade_data[result[0]["key"]] = [ele for ele in reversed(result)]
+        counter += 1
+
+    formatted_trade_data = {}
+
+    for trade in raw_trade_data:
+        trade_dict = {
+            "symbol" : trade.symbol,
+            "purchasePrice" : trade.effective_price,
+            "units" : trade.units,
+            "date" : trade.trade_date,
+            "tradeType" : trade.trade_type
+        }
+
+        if trade.symbol in formatted_trade_data:
+            formatted_trade_data[trade.symbol].append(trade_dict)
+        else:
+            formatted_trade_data[trade.symbol] = [trade_dict]
 
     end = time.time()
     total_time = end - start
     print("Request took " + str(total_time) + " seconds.")
-    return trade_data
+    # trade_data["ohlc"] = ohlc_data
+    # trade_data["ohlc_raw"] = ohlc_results
+    return {"chartData" : trade_data, "tradeData" : formatted_trade_data}

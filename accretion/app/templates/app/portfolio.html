@@ -18,7 +18,7 @@
                         <a class="font-medium text-black px-2 py-2 no-underline rounded inline-block transition-all hover:bg-gray-100"
                     href="#" onclick="portfolioView('1d')" id="1d-button">1D</a>
                     <a class="font-medium text-black px-2 py-2 no-underline rounded inline-block transition-all hover:bg-gray-100"
-                    href="#" onclick="portfolioView('1w')" id="1w-button">1W</a>
+                    href="#" onclick="portfolioView('5d')" id="5d-button">5D</a>
                     <a class="font-medium text-black px-2 py-2 no-underline rounded inline-block transition-all hover:bg-gray-100"
                     href="#" onclick="portfolioView('1m')" id="1m-button">1M</a>
                     <a class="font-medium text-black px-2 py-2 no-underline rounded inline-block transition-all hover:bg-gray-100"
@@ -37,10 +37,10 @@
             <table class="my-4 table-auto w-full" id="portfolio-table">
                 <thead>
                 <tr class="text-left uppercase border-0 border-b border-solid border-gray-300">
-                  <th class="py-3">Symbol</th>
-                  <th>Shares</th>
-                  <th>Value</th>
-                  <th id="change-row-heading">Total Change</th>
+                  <th class="py-3 font-bold">Symbol</th>
+                  <th class="font-bold">Shares</th>
+                  <th class="font-bold">Value</th>
+                  <th class="font-bold" id="change-row-heading">Change</th>
                 </tr>
                 </thead>
                 <tbody id="portfolio-table-body">
@@ -51,6 +51,8 @@
 {% endblock %}
 
 {% block scripts %}
+{% load static %}
+<script src="{% static 'js/portfolio.js' %}"></script>
 <script>
     loadPortfolioPage();
 </script>

@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import render
 from app.models import Portfolio, Profile, Trade
-from .stocks import get_portfolio_data, get_portfolio_data_1y
+from .stocks import get_portfolio_data, get_portfolio_data_1y, check_time
 
 import asyncio
 
@@ -20,3 +20,7 @@ def get_portfolio_1y(request):
     raw_trade_data = list(Trade.objects.filter(portfolio_id = portfolio_id).order_by('symbol'))
     data = asyncio.run(get_portfolio_data_1y(symbols, raw_trade_data))
     return JsonResponse(data, safe=False)
+
+def get_check_time(request):
+    day,time,time_valid = check_time()
+    return JsonResponse({"time": time, "dayOfWeek": day, "timeValid" : time_valid}, safe=False)

@@ -64,6 +64,10 @@ function loadPortfolioPage() {
             $("#content").append(createErrorElement());
         }
     });
+    setTimeout(() => {
+        
+    }, 10);
+    //TODO: Make this the main api call
     $.ajax({
         dataType: "json",
         type: 'GET',
@@ -127,35 +131,38 @@ function getColour(num) {
 }
 
 //TODO: Add 6M, 1Y and YTD view
+//TODO: Create checks to see how many shares they owned at each point in time
 function portfolioView(peroid) {
     let peroidLong = "";
     let total = 0;
     let starting = 0;
+
+    console.log(`peroid: {$peroid}`);
 
     const changeAmountElement = document.getElementById("change-amount");
     if (peroid == currentView) {
         return;
     }
     else if (peroid == "1d") {
-        peroidLong = "Day"
-        changeRowTitleElement.innerHTML = "DAY CHANGE";
+        peroidLong = "Today"
 
         for (trade in tradeData) {
             if (tradeData[trade]["units"] > 0) {
-            const tradeElement = document.getElementById(trade.toLowerCase() + "-change");
-            const totalGainsPercentage = ((tradeData[trade]["close"] - dataOneYear[trade][1]["close"]) / 
-            dataOneYear[trade][1]["close"] * 100).toFixed(2)
+                const tradeStarting = dataOneYear[trade][1]["close"]
+                const tradeTotal = dataOneYear[trade][0]["close"]
 
-            total += tradeData[trade]["close"] * tradeData[trade]["units"];
-            starting += dataOneYear[trade][1]["close"] * tradeData[trade]["units"];
+                const tradeElement = document.getElementById(trade.toLowerCase() + "-change");
+                const totalGainsPercentage = ((tradeTotal - tradeStarting) / tradeStarting * 100).toFixed(2)
 
-            tradeElement.innerHTML = `<td class="${getColour(total-starting)}" id="${trade}-change">${dollarFormatterZero.format(total-starting)} (${dollarFormatterZero.format(totalGainsPercentage)}%)</td>`;
+                total += tradeTotal * tradeData[trade]["units"];
+                starting += tradeStarting  * tradeData[trade]["units"];
+
+                tradeElement.innerHTML = `<td class="${getColour(total-starting)}" id="${trade}-change">${dollarFormatterZero.format(total-starting)} (${dollarFormatterZero.format(totalGainsPercentage)}%)</td>`;
             }
         }
     }
-    else if (peroid == "1w") {
+    else if (peroid == "5d") {
         peroidLong = "Week"
-        changeRowTitleElement.innerHTML = "WEEK CHANGE";
 
         for (trade in tradeData) {
             if (tradeData[trade]["units"] > 0) {
@@ -171,24 +178,41 @@ function portfolioView(peroid) {
         }
     }
     else if (peroid == "1m") {
-        peroidLong = "Month"
-        changeRowTitleElement.innerHTML = "MONTH CHANGE";
+        peroidLong = "1M"
+        console.log("abc 123");
 
+        let ny_time = new Date(new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
+        ny_time.setMonth(ny_time.getMonth() - 1);
+        ny_time = ny_time.toISOString().split('T')[0];
+        
         for (trade in tradeData) {
             if (tradeData[trade]["units"] > 0) {
-            const tradeElement = document.getElementById(trade.toLowerCase() + "-change");
-            const totalGainsPercentage = ((tradeData[trade]["close"] - dataOneYear[trade][29]["close"]) / 
-            dataOneYear[trade][29]["close"] * 100).toFixed(2)
+                let ny_time = new Date(new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
+                ny_time.setMonth(ny_time.getMonth() - 1);
+                ny_time = ny_time.toISOString().split('T')[0];
 
-            total += tradeData[trade]["close"] * tradeData[trade]["units"];
-            starting += dataOneYear[trade][29]["close"] * tradeData[trade]["units"];
+                let last_close;
 
-            tradeElement.innerHTML = `<td class="${getColour(total-starting)}" id="${trade}-change">${dollarFormatterZero.format(total-starting)} (${dollarFormatterZero.format(totalGainsPercentage)}%)</td>`;
+                for (x in dataOneYear[trade]) {
+                    if (new Date(Date.parse(ny_time)) >= new Date(Date.parse(dataOneYear[trade][x]["date"]))) {
+                        console.log(dataOneYear[trade][x]["date"]);
+                        console.log(last_close);
+                        break;
+                    }
+                    last_close = dataOneYear[trade][x]["close"]
+                }
+                
+                const tradeElement = document.getElementById(trade.toLowerCase() + "-change");
+                const totalGainsPercentage = ((tradeData[trade]["close"] - last_close) / last_close * 100).toFixed(2);
+
+                total += tradeData[trade]["close"] * tradeData[trade]["units"];
+                starting += last_close * tradeData[trade]["units"];
+
+                tradeElement.innerHTML = `<td class="${getColour(total-starting)}" id="${trade}-change">${dollarFormatterZero.format(total-starting)} (${dollarFormatterZero.format(totalGainsPercentage)}%)</td>`;
             }
         }
     }
     else if (peroid == "all") {
-        changeRowTitleElement.innerHTML = "TOTAL CHANGE";
         peroidLong = "Total";
         total = totalValue;
         starting = startingValue;
@@ -216,7 +240,7 @@ function portfolioView(peroid) {
 }
 
 function setActiveButton(activeButton) {
-    const buttons = ["1d", "1w", "1m", "3m", "6m", "1y", "ytd", "all"];
+    const buttons = ["1d", "5d", "1m", "3m", "6m", "1y", "ytd", "all"];
     const activeButtonElement = document.getElementById(activeButton + "-button");
 
     activeButtonElement.classList = "";
